@@ -1,0 +1,1632 @@
+Exercise: Social Media Network Database
+
+Database Design-
+
+1. Users:
+Code:
+create (u1:user {name: 'Falguni', email: 'falguni@mail.com', joined: 2019}),
+       (u2:user {name: 'Vijay', email: 'vijay@mail.com', joined: 2020}),
+       (u3:user {name: 'Nilesh', email: 'nilesh@mail.com', joined: 2018}),
+       (u4:user {name: 'Pratik', email: 'pratik@mail.com', joined: 2021}),
+       (u5:user {name: 'Pranjal', email: 'pranjal@mail.com', joined: 2022}),
+       (u6:user {name: 'Karan', email: 'karan@mail.com', joined: 2023})
+return u1, u2, u3, u4, u5, u6;
+Output:
+
+2. Posts:
+Code:
+create (p1:post {content: 'Neo4j is amazing!', posted_on: '2024-10-01', likes: 15}),
+       (p2:post {content: 'Learning Neo4j today!', posted_on: '2024-09-30', likes: 10}),
+       (p3:post {content: 'Graph databases are the future!', posted_on: '2024-10-03', likes: 8})
+return p1, p2, p3;
+Output:
+
+3. Follows Relationships:
+Code:
+match (u1:user {name: 'Falguni'}), (u2:user {name: 'Vijay'})
+create (u1)-[:FOLLOWS]->(u2)
+return u1, u2;
+Output:
+
+Code:
+match (u2:user {name: 'Vijay'}), (u3:user {name: 'Nilesh'})
+create (u2)-[:FOLLOWS]->(u3)
+return u2, u3;
+Output:
+
+
+
+Code:
+match (u1:user {name: 'Falguni'}), (u3:user {name: 'Nilesh'})
+create (u1)-[:FOLLOWS]->(u3)
+return u1, u3;
+Output:
+
+Code:
+match (u4:user {name: 'Pratik'}), (u5:user {name: 'Pranjal'})
+create (u4)-[:FOLLOWS]->(u5)
+return u4, u5;
+Output:
+
+Code:
+match (u5:user {name: 'Pranjal'}), (u6:user {name: 'Karan'})
+create (u5)-[:FOLLOWS]->(u6)
+return u5, u6;
+Output:
+
+4. Posted Relationships:
+Code:
+match (u1:user {name: 'Falguni'}), (p1:post {content: 'Neo4j is amazing!'})
+create (u1)-[:POSTED]->(p1)
+return u1, p1;
+Output:
+
+Code:
+match (u2:user {name: 'Vijay'}), (p2:post {content: 'Learning Neo4j today!'})
+create (u2)-[:POSTED]->(p2)
+return u2, p2;
+Output:
+
+Code:
+match (u3:user {name: 'Nilesh'}), (p3:post {content: 'Graph databases are the future!'})
+create (u3)-[:POSTED]->(p3)
+return u3, p3;
+Output:
+
+
+
+5. Likes Relationships:
+Code:
+match (u2:user {name: 'Vijay'}), (p1:post {content: 'Neo4j is amazing!'})
+create (u2)-[:LIKES]->(p1)
+return u2, p1;
+Output:
+
+Code:
+match (u1:user {name: 'Falguni'}), (p2:post {content: 'Learning Cypher today!'})
+create (u1)-[:LIKES]->(p2)
+return u1, p2;
+Output:
+
+
+
+Code:
+match (u4:user {name: 'Pratik'}), (p3:post {content: 'Graph databases are the future!'})
+create (u4)-[:LIKES]->(p3)
+return u4, p3;
+Output:
+
+
+
+6. Commented Relationships:
+Code:
+match (u1:user {name: 'Falguni'}), (p3:post {content: 'Graph databases are the future!'})
+create (u1)-[:COMMENTED {comment: 'Totally agree!'}]->(p3)
+return u1, p3;
+Output:
+
+Code:
+match (u3:user {name: 'Nilesh'}), (p2:post {content: 'Learning Cypher today!'})
+create (u3)-[:COMMENTED {comment: 'Great content!'}]->(p2)
+return u3, p2;
+Output:
+
+Code:
+match (u5:user {name: 'Pranjal'}), (p1:post {content: 'Neo4j is amazing!'})
+create (u5)-[:COMMENTED {comment: 'This is awesome!'}]->(p1)
+return u5, p1;
+Output:
+
+
+
+Retrieval Queries-
+Retrieve all users and their posts
+Code:
+match (u:user)-[:POSTED]->(p:post)
+return u.name AS User, p.content AS PostContent, p.posted_on AS PostedOn;
+Output:
+
+Fetch all posts and their likes
+Code:
+match (p:post)<-[:LIKES]-(u:user)
+return p.content AS PostContent, COUNT(u) AS TotalLikes;
+Output:
+
+Retrieve users who follow "Nilesh"
+Code:
+match (u:user)-[:FOLLOWS]->(f:user {name: 'Nilesh'})
+return u.name AS Follower;
+Output:
+
+Fetch all comments on a particular post
+Code:
+match (p:post {content: 'Graph databases are the future!'})<-[:COMMENTED]-(u:user)
+return u.name AS Commenter, p.content AS PostContent;
+Output:
+
+Retrieve all users and the people they follow
+Code:
+match (u:user)-[:FOLLOWS]->(f:user)
+return u.name AS Follower, f.name AS Followed;
+Output:
+
+Fetch all posts along with the number of comments they have received
+Code:
+match (p:post)<-[:COMMENTED]-(u:user)
+return p.content AS PostContent, count(u) AS TotalComments
+order by TotalComments desc;
+Output:
+
+
+#========================================
+
+
+Description - Create keyspaces
+
+Syntax - create keyspace [if not exists] keyspace_name
+with replication = {'class': 'SimpleStrategy','replication_factor':N | 'class' : 'NetworkTopologyStrategy','dc1_name' : N[,..]}[and durable_writes = true|false];]
+
+Create keysapce if not exist key_name with replication = { ‘class’ : ‘SimpleStrategy’,’replication_factorr’: 1}
+
+Code - create keyspace if not exists demo_keyspace with replication = {'class':'SimpleStrategy','replication_factor': 1};
+
+create keyspace if not exists myspace with replication = {'class':'SimpleStrategy','replication_factor': 3};
+
+Output -
+
+
+
+Description - create a table
+Code - create table mytab(id int primary key, name varchar, arcle text,is_paying_user boolean, phone_no set <varchar>);
+Output -
+
+
+
+
+
+Description - create data type
+Code - create type address(adline1 varchar, adline2 varchar, city varchar, state varchar, pcode int);
+create table customer(id int primary key, name varchar, addr address);
+Output -
+
+
+Description - Insert
+Code - create table tab(id int primary key, name varchar);
+insert into tab(id,name) values (1,'anju');
+select * from tab;
+
+Output -
+
+
+Code -
+create type point(x int, y int);
+create table location(area text primary key, loc point);
+insert into location(area,loc) values('Ghatkopar',{x:152,y:456});
+select * from location;
+
+Output -
+
+
+
+
+Code - insert into customer(id,name,addr) values (1, 'Anju',{adline1:'Sicily Apts',adline2: 'MG Road',city: 'Mumbai',state: 'Maharashtra',pcode:456321});
+Output - 
+
+
+Description - create a table course 
+Code - create table course(courseid int primary key, name text, coursecode varchar, hours int, faculty text);
+Output -
+
+
+
+
+Description - Time to live (TTL)
+Code - insert into course (courseid, name, coursecode, hours, faculty) values (111,'NoSQL','211NOSQL',45,'Sangeetha') using TTL 10 and TIMESTAMP 123456789;
+Output -
+
+
+
+
+Description - Alter table
+Code - alter table customer add contact text;
+describe customer;
+Output -
+
+alter table customer rename id to cid;
+
+Description - Update customer table
+Code - update customer set name = 'Anju Mary' where cid = 1;
+Output -
+
+
+
+
+Description - drop table/type
+Code -  
+drop table location;
+drop type point;
+Output -
+
+
+Description - deleting a row
+Code - delete from customer where cid = 1;
+Output -
+
+
+Description - truncate
+Code -
+Select * from tab;
+truncate tab;
+Select * from tab;
+Output -
+
+
+
+
+Description - Lists
+Code - 
+create table list_demo(id int primary key, list_col list <int>);
+insert into list_demo(id, list_col) values(1, [1,2,1]);
+select * from list_demo;
+Output -
+
+
+Code - 
+create table product(pid int primary key, name text, prices list<int>);
+insert into product(pid,name,prices) values(101, 'Book',[200,300,400]);
+insert into product(pid,name,prices) values(102, 'Cup',[100,230,150,200,300]);
+Output -
+
+
+Code - 
+create table product(pid int primary key, name text, prices list<int>);
+insert into product(pid,name,prices) values(101, 'Book',[200,300,400]);
+Output - 
+
+
+Code - 
+insert into product(pid,name,prices) values(103, 'Laptop',[200,300,400,500,600]);
+Output - 
+
+
+Description - Appending and Prepending 
+Code - update list_demo set list_col = list_col + [4,5] where id = 1;
+update product set prices = prices + [400] where pid = 101;
+Output -
+
+
+
+Code - update list_demo set list_col = [0] + list_col where id = 1;
+Output - 
+
+
+Code - update product set prices = [400] +  prices where pid = 101; 
+Output - 
+
+
+
+Description - Delete by index
+Code - delete list_col[2] from list_demo where id = 1;
+Output -
+
+
+Code - delete prices[3] from product where pid = 101;
+Output -
+
+
+Description - deleting an item in the list by value deletes all copies of it 
+Code - update list_demo set list_col = list_col - [1] where id = 1;
+update product set prices = prices - [400] where pid = 101;
+
+Output -
+
+
+Description - Sets
+Code - create table set_demo(id int primary key, set_col set<text>);
+insert into set_demo(id, set_col) values (1, {'head','tail','head'});
+select * from set_demo;
+
+Output -
+
+
+Code - 
+update set_demo set set_col = set_col + {'right'} where id = 1;
+Output -
+
+
+Code - update set_demo set set_col = set_col - {'head'} where id = 1;
+Output - 
+
+
+
+Code - create table team_match (city varchar, team_name varchar, is_participating boolean, player_id set<int>, primary key (city,team_name));
+insert into team_match(city,team_name,is_participating,player_id) values ('Mumbai','ABC',true,{101,102,103});
+Output -
+
+
+Description - Maps
+Code - create table map_demo(id int primary key, map_col map<int, text>);
+insert into map_demo(id,map_col) values (1, {1:'one',2 :'two',1:'dupe'});
+Output - 
+
+Code - update map_demo set map_col[3] = 'three' where id = 1;
+Output -
+
+
+
+
+
+Code - delete map_col[2] from map_demo where id=1;
+Output -
+
+
+Description - create the table to store id, name, address - udt, completed sems - set, marks in 5 diff subjects - map, emails personal somaiya - list
+Code - 
+create table stud(id int primary key, name varchar, addr address,completed_sems set<int>,marks map<varchar,int>, email list<varchar>);
+
+insert into stud(id,name,addr,completed_sems,marks,email) values (101,'ABC',{adline1:'Sicily Apts',adline2: 'MG Road',city: 'Mumbai',state: 'Maharashtra',pcode:456321}, {1,2,3}, 
+{'dbms':90,'web tech':95,'python':80,'ai':88,'bs':85},['abc@somaiya.edu','abc12@gmail.com']);
+
+insert into stud(id,name,addr,completed_sems,marks,email) values (102,'PQR',{adline1:'qwe Apts',adline2: 'wewe',city: 'Mumbai',state: 'Maharashtra',pcode:456321}, {1,2,3,4}, {'dbms':56,'web tech':65},['pqr@somaiya.edu','pqr12@gmail.com']);
+
+insert into stud(id,name,addr,completed_sems,marks,email) values (102,'XYZ',{adline1:'ewew Apts',adline2: 'gsdg',city: 'Mumbai',state: 'Maharashtra',pcode:456321}, {1,2}, {'dbms':86,'web tech':87,'python':80},['xyz@somaiya.edu','xyz12@gmail.com']);
+
+Output -
+
+
+
+
+Description - Fetch data of all students
+Code - select * from stud;
+Output -
+
+
+Description - Fetch name and address of students when id is given
+Code - select name, addr from stud where id = 101;
+Output -
+
+
+
+Description - Fetch marks of students with id
+Code - select marks from stud where id = 102;
+Output -
+
+
+
+Description - update the completed sem - add 1 more sem
+Code - UPDATE stud
+SET completed_sems = completed_sems + {1}
+WHERE id = 101;
+Output -
+
+
+Description - update the marks of dbms 
+Code - UPDATE stud
+SET marks['dbms'] = 91
+WHERE id = 101;
+Output -
+
+
+Description - update the personal email id of a student
+Code - UPDATE stud
+SET email = email + ['new_email@gmail.com']
+WHERE id = 101;
+
+Output -
+ 
+
+
+Description - delete the record of a student when id is given
+Code - 
+Output -
+
+
+#=================================================
+
+
+Session 1 
+Description - To create and use database
+Syntax - use database name
+Code - use firstdb
+Output -  
+
+
+Description - To show all the databases
+Syntax - show databases
+Code - show databases
+Output -
+
+
+
+
+Description - To drop/delete database
+Syntax - db.dropDatabase()
+Code - db.dropDatabase()
+Output -
+
+
+Description -  To create collection
+Syntax - db.createCollection(“collectionName”)
+Code - db.createCollection("person")
+Output -
+
+
+Description - To see all the collections in the db
+Syntax - show collections/tables
+Code - show collections OR db.getCollectionNames()
+Output -
+
+
+
+Description - Insert a document into a collection 
+Syntax - db.collectionName.insert({“key”:value})
+Code - db.person.insert({"pid":1011,"pname":"Pranjal"})
+Output -
+
+
+Description - To show data in the collectionfind
+Syntax - db.collectionName.find()
+Code - db.person.find()
+Output -
+
+
+Description - To drop a collection
+Syntax - db.collectionName.drop()
+Code - db.person.drop()
+Output -
+
+
+
+
+
+
+
+
+Exercise 1
+
+Description - Create a document book
+Code - db.createCollection("Book") 
+Output -
+
+
+Description - Create 5 documents
+Code - 
+db.Book.insertOne({"Book_id":101,"Title":"abc","Publisher_add":"mumbai","no_of_pages":200,"price":100})
+db.Book.insertOne({"Book_id":102,"Title":"xyz"})
+ db.Book.insertOne({"Book_id":103,"Author":"pqr"})
+db.Book.insertOne({"Book_id":104,"Author":"pqr","price":300})
+db.Book.insertOne({"Book_id":105,"Author":"pqr","price":300,"title":"qwer"})
+Output -
+
+
+Session 2
+
+Description - working of capped collection
+Syntax -  db.createCollection("product",{capped:true,size:1024,max: size of the record})
+Code -  db.createCollection("product",{capped:true,size:1024,max:2})
+(insert 3 records to check if the records are inserted as the size is 2)
+db.product.insertOne({"id":1,"name":"abc"})
+db.product.insertOne({"id":2,"name":"pqr"})
+db.product.insertOne({"id":3,"name":"xyz"})
+Output - 
+
+(as the size is 2 it overwrites the 1st record and only the last 2 records are visible)
+
+
+
+
+
+
+
+
+Description - check if the collection is capped
+Syntax -  db.collectionName.isCapped()
+Code - db.log.isCapped()
+Output -
+
+
+Description - Delete a collection
+Syntax - db.collectionName.drop()
+Code - db.product.drop()
+Output - 
+
+
+
+
+Description - To insert one and many docs
+Syntax -
+db.collection.insertOne(<document>{writeconcern :<document>}
+) 
+db.collection.insertMany(
+[<document 1>, <document 2>,...]
+{
+writeConcern: <document>
+Ordered: <boolean>
+}
+)
+Code -  
+db.products.insertOne({item:"card",qty:15});
+db.products.insertOne({_id:10,item:"box",qty:20});
+
+db.products.insertMany([{item:”card”,qty:15},{item:”envelope”,qty:20},{item:”stamps”,qty:30}])
+db.products.insertMany([{_id:04,item:"pens",qty:10},{_id:05,item:"pencil",qty:10},{_id:06,item:"paper",qty:20}]);
+Output -
+
+In the first insert query as id is not mentioned - a system generated ObjectId is created
+In the second query as the id is mentioned it is considered as the ID and no object id is created provided the format is same  -> _id:
+
+
+
+Description - insert multiple documents using variable
+Syntax - var varname = [ {_id:...} , {}] dp.product.insertMany(prod) 
+Code - var prod = [{pid:101,pname:"laptop",category: "electronics"},{pid:101,pname:"oven",category:"home appliance"}]
+ db.products.insertMany(prod);
+Output -
+
+
+
+Description - Nested/Embedded Documents
+Code - 
+Create and insert an inventory collection
+db.inventory.insertMany([
+{item:"journal",qty:25,size:{h:14,w:21,uom:"cm"},status:"A"},
+{item:"notebook",qty:50,size:{h:8.5,w:11,uom:"in"},status:"A"},
+{item:"paper",qty:100,size:{h:8.5,w:11,uom:"in"},status:"D"},
+{item:"planner",qty:75,size:{h:22.85,w:30,uom:"cm"},status:"D"},
+{item:"postcard",qty:45,size:{h:10,w:15.25,uom:"cm"},status:"A"}
+]);
+Output -
+
+
+Description - Arrays
+Code - 
+db.inventory.insertMany([
+{item:"journal",qty:25,tags:["blank","red"],dim_cm:[14,21]},
+{item:"notebook",qty:50,tags:["red","blank"],dim_cm:[14,21]},
+{item:"paper",qty:100,tags:["red","blank","plain"],dim_cm:[14,21]},
+{item:"planner",qty:75,tags:["blank","red"],dim_cm:[25,85,30]},
+{item:"postcard",qty:45,tags:["blue"],dim_cm:[10,15.25]}
+]);
+Output -
+
+
+
+
+Description - Array of Embedded Documents
+Code - 
+db.inventory.insertMany([
+{item:"journal",instock: [{warehouse: “A”,qty:5},{warehouse:”C”, qty:15}]},
+{item:"notebook",instock: [{warehouse: “C”,qty:5} ]},
+{item:"paper",instock: [{warehouse: “A”,qty:60},{warehouse:”B”, qty:15}]},
+{item:"planner",instock: [{warehouse: “A”,qty:40},{warehouse:”B”, qty:5}]},
+{item:"postcard",instock: [{warehouse: “B”,qty:15},{warehouse:”C”, qty:35}]}
+]);
+Output -
+
+
+
+
+
+Exercise 2
+
+Code -    
+db.Book.insertMany([
+... {Bookid:6,Title: "DBMS",  pages: { c1: 12, c2: 21 }},
+... {Bookid:7, Title: "OS", pages: { c1: 15, c2: 25 }},
+... ]);
+{
+db.Book.insertMany([
+ {Bookid:8,Title:"SQL", available: ["India","US","UK", "Japan"]},
+... {Bookid:9,Title:"Python",available: ["India","US","UK"] },
+...
+... ]);
+{
+ db.Book.insertMany([
+... {Bookid:10,Title: "Java", price: [{ E1: 450 }, { E2: 600 }]  },
+... {Bookid:11, Title: "NoSQL", price: [{ E1: 800 }, { E2: 900 }]},
+... ]);
+Output -
+
+Description - Find specific equality condition
+Syntax - db.collection.find({specify})
+Code -  db.inventory.find({status: "D"})
+Output -
+
+
+Description - Specify IN condition
+Syntax - db.collection.find({status:{$in:["A","D"]}})
+SQL - Select * from inventory where status in ( “A”, “B”)
+Code - db.inventory.find({status:{$in:["A","D"]}})
+Output -
+
+
+Description - Specify Less Than condition
+Syntax - db.collection.find({...})
+SQL - Select * from inventory where status = “A” and qty < 30
+Code - db.inventory.find({status:"A",qty : {$lt:30}})
+Output -
+
+
+Description -  or condition
+Syntax -  db.collection.find( { $or : [ { condition}]  })
+SQL - Select * from inventory where status = A” or qty < 50
+Code -   db.inventory.find({ $or : [{status :"A" , qty :{ $lt : 50}} ] })
+Output - 
+
+
+Description -  or condition
+Syntax -  db.collection.find( { $or : [ { condition}]  })
+SQL - Select * from inventory where status = A” or qty < 50
+Code -  db.inventory.find({ status: "A", $or: [{ qty: {$lt:30}},{item: /^p/}]})
+Output -
+
+
+Session 3
+
+Assignment: Design the queries as followed:
+
+Single:
+Description - Find books with publisher "M K Stans"
+Code - db.Book.find({publisher:{$in:["M K Stans"]}})
+Output -
+
+
+Description - Find books with price 200,150
+Code - db.Book.find({price:{$in:[200,150]}})
+Output -
+
+
+Description - Find books with address as Mumbai
+Code - db.Book.find({bpaddress:"mumbai"})
+Output -
+
+
+
+Description - Find book with id 111
+Code - db.Book.find({bookid:111})
+Output -
+
+
+AND-
+Description - Find books having address as mumbai and price 200
+Code - db.Book.find({bpaddress:"mumbai",price:{$lt:300}})
+Output -
+
+
+Description - Find book with author Olivia and publisher MK Stans
+Code - db.Book.find({publisher:"M K Stans",author:"Hannay Baker"})
+Output -
+
+
+Description - Find books with quantity 25 and tithe Sarah Green
+Code - db.Book.find({qty:25,title:"Sarah Green"})
+Output -
+
+
+Description - Find books with publisher prime book and price 200
+Code - db.Book.find({bpublisher:"prime book",price:200})
+Output -
+
+
+Description - Find book with price less than 400 and title fast life
+Code - db.Book.find({price:{$lt:400},btitle:"fast life"})
+Output -
+
+
+
+OR-
+Description - Find book with either quantity 25 or publisher MK Stans
+Code - db.Book.find({$or:[{qty:25},{publisher:"M K Stans"}]})
+Output -
+
+
+Description - Find book with author Ram Krishna or price 200
+Code - db.Book.find({$or:[{author:"ram krishna"},{price:200}]})
+Output -
+
+
+Description - Find book with address mumbai or quantity 25
+Code - db.Book.find({$or:[{bpaddress:"mumbai"},{qty:25}]})
+Output -
+
+
+Description - Find book with publisher harry book or M K stans
+Code - db.Book.find({$or:[{bpublisher:"harry book"},{publisher:"M K Stans"}]}) 
+Output -
+
+
+Description - Find book with author Olivia Baker or quantity 25
+Code - db.Book.find({$or:[{author:"Olivia Baker"},{qty:25}]})
+Output -
+
+
+
+Combination-
+Description - Find book with price 200 and title starting with R or A
+Code - db.Book.find({price:400,$or:[{btitle:/^r/},{title:/^A/}]})
+Output -
+
+
+Description - Find book with address mumbai and price less than 200 or publisher prime book
+Code - db.Book.find({bpaddress:"mumbai",$or:[{price:{$lt:400}},{bpublisher:"prime book"}]})
+Output -
+
+
+Description - Find book bid with 103 and address as nagpur or delhi
+Code - db.Book.find({bid:103,$or:[{bpaddress:"nagpur"},{bpaddress:"Delhi"}]})
+Output -
+
+
+Description - Find book with publisher M K Stans and author as  Olivia Baker of Ram Krishna
+Code - db.Book.find({publisher:"M K Stans",$or:[{author:"Olivia Baker"},{author:"ram krishna"}]})
+Output -
+
+
+Description - Find book with address address nagpur and publisher prime book having title starting with p
+Code - db.Book.find({bpaddress:"nagpur",$or:[{bpublisher:"prime book"},{btitle:/^p/}]})
+Output -
+
+
+
+Session 4 
+
+Query on Nested Field with Dot Notation
+
+Description - To specify a condition on fields in an embedded/nested document, we use the dot notation.
+(“field.nestedField”).
+Code - db.inventory.find({“size.uom”:“in”})
+Output - 
+
+
+
+Description - Height less than 15: 
+Code -  db.inventory.find({"size.h":{ $lt: 15}})
+Output -
+
+
+Code - db.inventory.find({"size.h":{$lt:15},"size.uom":"in",status:"D"})
+Output -
+
+
+
+
+
+
+Description - Match an Embedded/ Nested Document
+Code -  db.inventory.find({size:{ h: 14, w: 21, uom:"cm"}})
+Output -
+
+
+
+
+Description - Match an Array 
+Code -  db.inventory.find({tags:["red","blank"]})
+Output -
+
+
+Code -  db.inventory.find({tags:"red"})
+Output -
+
+
+Code -  db.inventory.find({dim_cm:{$gt:25}})
+Output -
+
+
+
+
+
+
+Description - Array with Compound Filter Condition on the Array Elements
+Code - db.inventory.find({dim_cm:{$gt:15,$lt:20}})
+Output -
+
+
+
+Description - an Element by the Array Index Position 
+Code - db.inventory.find({"dim_cm.1":{$gt:25}})
+Output -
+
+
+Description - Array By Array Length 
+Code -  db.inventory.find({"tags":{$size:3}})
+Output -
+
+
+Description -  Document Nested in an Array 
+Code -  db.inventory.find({"instock":{warehouse:"A",qty:5}})
+Output - 
+
+
+Description - Select all document where the instock array has at least one embedded document that contains the field qty whose value is less than or equal to 20
+Code - db.inventory.find({"instock.qty":{$lte:20}})
+Output - 
+
+
+Description - Array Index to Query for a Field in the Embedded Document .
+Code - db.inventory.find({"instock.0.qty":{$gt:30}})
+Output - 
+
+
+
+Description - Combination of Elements Satisfies the Criteria 
+
+Code - db.inventory.find({"instock.qty":{$gt:10,$lte:20}})
+Output -  
+
+
+
+
+Description - element that satisfies Multiple Criteria (AND On Arrays ) 
+Code - db.inventory.find({dim_cm:{$elemMatch:{$gt:22,$lt:30}}})
+Output - 
+
+
+
+Description - Document Nested in an Array
+
+A single Nested Document Meets Multiple Query Conditions on Nested Fields 
+
+
+Code - db.inventory.find({ "instock": {$elemMatch: {qty: {$gt: 10, $lte: 20}}}})
+Output - 
+
+
+Code -  db.inventory.find({"instock":{$elemMatch:{warehouse:"C"}}})
+Output -
+
+
+
+
+Create a collection to store the HR data of an organisation. The requirement is to store the employee details in different documents. By creating the collection the main goal is to remove the join operations which are needed to fetch the details such as department, teams and projects in which the employee is involved.
+
+Assume and mention the details needed to store the data in MongoDB.
+
+Create a report to show the details and write queries to create the collections and documents.
+
+Report  : 
+
+Employee details : 
+EmpID,
+ EmpName
+ {
+first name , 
+middle name 
+,last name
+}, 
+Contact No
+{
+Cno1,
+Cno2,
+CEno
+}
+,Address(Embedded document)
+{Adhar Card Address,
+Current address
+c},
+Details (Embedded document)
+{
+AadharCardID,
+PanCardNo,
+Account No , 
+IFSC Code
+},
+,Qualification [ARRAY] , 
+Department (embedded document ) 
+{
+did,
+dname,
+EmpId,
+dManager,
+Location
+} , 
+Projects (Embedded Document)
+{
+pid,
+pname,
+description,
+startDate,
+endDate,
+status,
+Team : { teamid,teamName,EmpId,EmpName,pid,pname,tlead}
+}
+
+
+Session 5 
+
+Description - Return All Fields in Matching Documents 
+Code - db.inventory.find({status:"A"})
+Output -
+
+
+
+
+Description - Return all the specified fields and the _id Field Only
+Code - db.inventory.find({status:"A"},{item:1,status:1})
+Output -
+
+
+
+
+
+
+Description - Suppress Field
+Code - db.inventory.find({status:"A"},{item:1,status:1,_id:0})
+Output -
+
+
+Description - Return All But the Excluded Fields 
+Code - db.inventory.find({status:"A"},{status:0,instock:0})
+Output -
+
+ 
+
+Description - Return the Specific Field in Embedded Documents
+Code - db.inventory.find({status:"A"},{item:1,status:1,"size.uom":1})
+Output -
+
+
+Description - Suppress the Specific Field in Embedded Document 
+Code - db.inventory.find({status:"A"},{"size.uom":0})
+Output -
+
+
+Description - The _id field (Returns by default) 
+Code - db.inventory.find({},{_id:1})
+Output -
+
+Description - Return All the Status Field 
+Code - db.inventory.find({},{_id:0,status:1})
+Output -
+
+
+Description - Return All the Item Field
+Code - db.inventory.find({},{_id:0,item:1})
+Output -
+
+Description - The qty field in the documents embedded in the instock array
+Code - db.inventory.find({status:"A"},{item:1,status:1,"instock.qty":1})
+Output -
+
+
+
+Description - Inserting Null Value
+Code -  db.inventory.insertMany([{_id:1,item:null},{_id:2}])
+Output - 
+
+Description - Equality Filter
+Code - db.inventory.find({item:null})
+Output -
+
+db.inventory.find({item:{$eq:null}})
+
+
+
+Non-Equality Filter 
+
+Code : db.inventory.find({item:{$ne:null}})
+Output : 
+
+
+
+Existence Check 
+
+Code :  db.inventory.find({item:{$exists:false}})
+Output : 
+
+
+
+
+Session 6
+
+Description -  To update one document (filter is the selection criteria, update is the modification to apply, upsert(one of the options) is to create new doc if no doc match the filter)
+Syntax - db.collection.updateOne(filter,update,options)
+Code - 
+db.student1.insertMany([{_id:1,test1:95,test2:92,test3:90,modified: new Date("01/05/2020")},{_id:2, test1:98,test2:100,test3:102, modified:new Date("01/05/2020")},{_id:3,test1:95,test2:110,modified: new Date("01/04/2020")}])
+
+db.student1.updateOne({name : “karna”},[{$set:{"test3":98,modified:"$$NOW"}}])
+
+Output -
+
+
+
+Description - Exception Handling in Update One
+Syntax -  try(update query)catch(e)
+Code - db.restaurant.insertMany([{"_id":1,"name":"Central Park Cafe","Borough":"Manhattan"},{"_id":2,"name":"Rock A Feller Bar and Grill","Borough":"Queens","violations":2},{"_id":3,"name":"Empire State Pub","Borough":"Brooklyn","violations":0}]);
+
+try{
+db.restaurant.updateOne({"name":"Central Perk Cafe"},{$set:{"violations":3}});
+}catch(e){
+print(e);
+}
+
+Output -
+
+
+
+Description - Update Upsert
+Syntax - 
+Code - 
+Normal code without upsert
+db.student1.updateOne({_id:4},[{$set:{test1:89,modified:"$$NOW"}}])
+Code with upsert
+db.student1.updateOne({_id:4},[{$set:{test1:89,modified:"$$NOW"}}],{upsert:true})
+Output -
+
+
+For restaurant collection
+db.restaurant.updateOne({"_id":2},[{$set:{"name":"Rock Bar and Grill"}}],{upsert:true})
+db.restaurant.updateOne({"_id":5},[{$set:{"name":"Rock Bar and Grill"}}],{upsert:true})
+
+
+Aggregation Pipeline
+consists of one or more stages that process doc. Each stage performs an operation on the input docs. The doc that are output from a stage are passed to the next stage. An aggregation pipeline can return results for groups of docs. 
+Consist of following stages:
+$addFields and its alias $set
+$project and its alias $unset
+$replaceRoot and its alias $replaceWith
+
+Create Student 
+Id
+Name
+Points
+Commentsem1
+Commentsem2
+lastUpdate - isodate
+
+
+
+Description - Using Unset
+Code - db.student2.updateOne({_id:1},
+[{$set:{status:"Modified", comments:["$commentSem1","$commentSem2],lastUpdate: "$$NOW"}}, {$unset: ["commentSem1","commentSem2"]}])
+Output -
+
+
+
+The $set stage - 
+Creates a new array field comments whose elements are the current content of the misc1 and misc2 fields
+
+
+db.student3.insertMany([{"_id":1,"tests": [95,92,90],"average":92,"grade":"A","lastUpdate":ISODate("2020-01-23T05:18:40.013Z")},{"_id":2,"tests":[94,88,90],"average":91,"grade":"A","lastUpdate":ISODate("2020-01-23T05:18:40.013Z")}, {"_id":3,"tests":[70,75,82], "lastUpdate":ISODate("2019-01-01T00:00:00Z")}])
+
+
+db.student3.updateOne({_id:3},
+[{$set:{average:{$trunc : [ {$avg : "$tests"}, 0]}, lastUpdate: "$$NOW"}}, { $set: {grade: { $switch: { branches : [ { case: {$gte: [ "$average", 90]}, then:"A"},{case: {$gte: ["$average", 80]}, then: "B"},{case: {$gte: ["$average",70]}, then:"C"},{case:{$gte: ["$average",60]},then: "D"}],default:"F"}}}}])
+
+5min aaya
+
+
+
+db.student3.updateOne({_id:1},
+[
+{$set:{total:{$trunc:[{$sum:"$tests"},0]},lastUpdate:"$$NOW"}},
+]
+)
+
+
+try{db.restaurant.updateOne({ "violations":{$gt:10}}, {$set: {"Closed":true}},{upsert: true});}catch(e){print(e);}
+
+
+try
+{
+db.restaurant.updateOne(
+{name:"Pizza's Pizzaria"},
+{$inc:{violations:3},$set:{Closed:true}},
+{w:"majority",wtimeout:100}
+);
+}
+catch(e)
+{
+print(e);
+}
+
+
+Description - Collation
+Code - db.coll.insertMany([
+{_id:1,category:"cafè",status:"A"},
+{_id:2,category:"cafe",status:"a"},
+{_id:3,category:"cafE",status:"a"}
+])
+Output -
+db.coll.updateOne({category:"cafe"},{$set: {status: "Updated"}}, { collation: {locale:"en",strength:1}});
+
+db.coll.updateOne({category:"cafe"},{$set: {status: "B"}}, { collation: {locale:"en",strength:3}});
+
+
+
+
+Session 7
+Description - updatemany()
+Syntax - db.collectionName.updateMany()
+Code - try{db.restaurant.updateMany( {violations : {$gt : 4}},{$set: {"Review":true}});} catch (e){print(e);}
+Output -
+
+
+Description - create new collection and add records
+Code - db.createCollection("police")
+db.police.insertMany([
+  {_id: 92412, inspector: "Swapnil", Sector: 1, Patrolling: true},
+  {_id: 92413, inspector: "Ritika", Sector: 2, Patrolling: false},
+  {_id: 92414, inspector: "John", Sector: 3, Patrolling: true},
+  {_id: 92415, inspector: "Peter", Sector: 3, Patrolling: false}
+])
+Output -
+
+
+Description - update all documents with sector greater than
+Code - 
+try{
+db.police.updateMany({"Sector": {$gt:4},"inspector":"Peter"},{$set:{"Patrolling":false}},{upsert:true});
+}catch(e){print(e);}
+Output -
+
+
+Description - Update many with switch
+Code - 
+db.students3.insertMany([{"_id":1,"tests":[95,92,90],"modified":ISODate("2019-01-01T00:00:00Z")},{"_id":2,"tests":[94,88,90],"modified":ISODate("2019-01-01T00:00:00Z")},{"_id":3,"tests":[70,75,82],"modified":ISODate("2019-01-01T00:00:00Z")}]);
+
+db.students3.updateMany({},
+[
+{$set:{average:{$trunc:[{$avg:"$tests"},0]},modified:"$$NOW"}},
+{$set:{grade:{$switch:{
+branches:[
+{case:{$gte:["$average",90]},then:"A"},
+{case:{$gte:["$average",80]},then:"B"},
+{case:{$gte:["$average",70]},then:"C"},
+{case:{$gte:["$average",60]},then:"D"},
+],
+default:"F"
+}}}}
+]);
+
+Output -
+
+
+
+Description - Delete one
+Code - db.police.deleteOne({"_id":92413})
+Output -
+
+
+Description - Delete Many
+Code - db.police.deleteMany({Sector:3})
+Output -
+
+
+Description - create a collection music to store the details of music (movie, album, concert) such as artist, instruments, lyricist, director etc. Insert 5 documents with varying fields 
+Code - db.music.insertOne({
+  _id: 1,
+  title: "The Breakup Song",
+  type: "movie",
+  movieName: " Ae Dil Hai Mushkil",
+  artist: {"artistid":101,"artistName":"Arijit Singh"},
+  genre: "romantic",
+})
+db.music.insertOne({
+  _id: 2,
+  artist: {"artistid":102,"artistName":"Rima", YoP:15},
+  instruments: [{instid:'I1',name:'Paino',instfamily:'Persussion'},
+{instid:'I2',name:'guitar',instfamily:'string'}],
+lyricist: {lid:'L1',lname: 'Piyush', Yinl:5}})
+
+db.music.insertOne({
+  _id: 3,
+artist: {"artistid":103,"artistName":"Shreya", YoP:10},
+  instruments: [{instid:'I1',name:'Paino',instfamily:'Persussion'},
+{instid:'I2',name:'flute',instfamily:'woodwind'}],
+lyricist: {lid:'L2',lname: 'Param', Yinl:15}})
+db.music.insertOne({
+  _id: 4,
+  artist: {"artistid":104,"artistName":"Rohan", YoP:15},
+  instruments: [{instid:'I1',name:'Paino',instfamily:'Persussion'},
+{instid:'I2',name:'guitar',instfamily:'string'}],
+lyricist: {lid:'L1',lname: 'Shreya', Yinl:5}})
+
+db.music.insertOne({
+  _id: 5,
+artist: {"artistid":105,"artistName":"Rahul", YoP:10},
+  instruments: [{instid:'I1',name:'Paino',instfamily:'Persussion'},
+{instid:'I2',name:'flute',instfamily:'woodwind'}],
+lyricist: {lid:'L2',lname: 'Param', Yinl:15}})
+
+Output -
+
+Description - Show all docs
+Code - db.music.find()
+Output -
+
+
+
+
+
+Description - Find with id 2
+Code - db.music.find({_id:2})
+Output -
+
+Description - count of docs
+Code - db.music.countDocuments()
+Output -
+
+Description - Find first document
+Code - db.music.findOne()
+Output -
+
+
+Description - Skip first 2 docs
+Code -  db.music.find().skip(2)
+Output -
+
+
+
+Description - find first 2
+Code - db.music.find().limit(2)
+Output -
+
+
+Description - use limit and skip together
+Code -  db.music.find().limit(2).skip(1)
+Output -
+Description - fetch artist details of song 3
+Code -  db.music.find({_id:3},{artist:1})
+Output -
+
+Description - fetch lyricist details of song 2
+Code -  db.music.find({_id:2},{lyricist:1})
+Output -
+Description - fetch the music details of artist rima (nested doc field)
+Code - db.music.find({"artist.artistName":'Rima'})
+Output -
+
+Description -  Fetch song details by lyricist param
+Code - db.music.find({"lyricist.lname":'Param'})
+Output -
+
+Description - Multiple nested objects
+Code - db.music.find({"lyricist.lname":'Param',"artist.artistName":'Rahul'})
+Output -
+
+
+Description - fetch details of songs with lyricist having more than 14 yrs of industry experience
+Code - db.music.find({"lyricist.Yinl": {$gt:14}})
+Output -
+
+Description - fetch the name of artist with YoP more than 10
+Code - db.music.find({"artist.YoP": {$gt:10}},{'artist.artistName':1})
+Output -
+
+Description - Find the details of songs with lyricist year in industry less than 15
+Code - db.music.find({"lyricist.Yinl": {$lt:15}}) | 
+Output -
+
+Description - find the details of songs with lyricist year in industry < 15 and artist year of of practice >= 15
+Code - db.music.find({$and:[{'artist.YoP':{$gte:15},'lyricist.Yinl':{$lt:15}}) | db.music.find({'lyricist.Yinl':{$lt:15},'artist.YoP':{$gte:15}})
+Output -
+
+
+
+Description - 
+Code - db.music.find({$or:[{'instruments.name':'Piano','artist.artistName':'Rima'}]})
+Output -
+Description - 
+Code - db.music.find({'artist.YoP':{$in:[10,30]}})
+Output -
+
+Description - 
+Code -  db.music.find({'artist.YoP':{$nin:[15,30]}},{'artist.artistid':1})
+Output -
+
+Code - db.music.insertOne({_id:6,artist:{artistid:106,artisitName:'Mitul',YoP:6}, lyricist:{ lid: 'L4',lname:'Thara'}})
+
+
+Output - 
+
+Code - db.music.find({instruments:{$exists:false}})
+Output - 
+
+Code - db.music.find({'artist.YoP':{$exists:true}})
+Output -
+
+Code - db.music.find({'artist.YoP':{$exists:false}})
+Output -
+
+Description - Range	
+Code - db.music.find({'artist.YoP':YoP_range},{'artist.artistName':1})
+Output -
+
+Code - db.music.find({'artist.YoP':YoP_range},{'artist.artistName':1})
+Output -
+
+Description - replace
+Code - db.music.insertOne({_id:7,artist:'Hari'})
+db.music.replaceOne({_id:5},{_id:5,artist: 'Niya'})
+db.music.find()
+Output -
+
+
+Code - db.music.replaceOne({_id:8},{_id:8,artist: 'Miyaz'},{upsert:true})
+Output - 
+
+
+
+
+Session 8
+Description - update() & updateMany()
+Code - db.employee.insertOne({eid:101,ename:'Harish',age:25,designation:'Analyst',salary:50000})
+db.employee.insertOne({eid:102,ename:'Nikita',age:35,designation:'Data Scientist',salary:100000})
+db.employee.insertOne({eid:103,ename:'Raj',age:30,designation:'ML Engg',salary:50000})
+Output -
+
+Code -
+db.employee.update({eid:103},{$set:{age:35}})
+db.employee.updateOne({eid:103},{$set: {salary:75000}})
+db.employee.updateMany({salary:{$lte:50000}},{$set:{salary:60000}})
+
+Output -
+Code - 
+db.employee.updateMany({salary:{$lt:75000}},{$inc:{salary:20000}})
+db.employee.updateMany({salary:{$gt:75000}},{$inc:{salary:-20000}})
+db.employee.updateMany({designation:'Data Scientist'},{$mul:{salary:-20000}})
+
+Output -
+
+
+Code - db.marks.insert({name:'Tom',age:28,marks:[50,60,70]})
+db.marks.update({name:'Tom',marks:50},{"$set":{"marks.$":55}})
+Output -
+db.marks.update({name:'Tom',marks:50},{"$set":{"marks.$":55}})
+db.marks.insert({name:'Tom',age:23,marks:[{subject:"english",marks:90},{subject:"maths",marks:100},{subject:"computrs",marks:20}]})
+db.marks.update({name:'Tom','marks.subject':"english"},{"$set":{"marks.$.marks":85}})
+
+
+
+Session 9
+Description - Sorting  Ascending
+Code - db.employee.find().sort({salary:1})
+Output -
+
+
+Description - sorting descending
+Code - db.employee.find().sort({salary:-1})
+Output -
+
+
+Code - 
+var c=db.employee.find({eid:101})
+while(c.hasNext()) printjson(c.next())
+
+while(price.hasNext()) printjson(price.next())
+
+Output -
+
+
+
+Assignment
+Description - create orders table
+Code - 
+db.orders.insertMany([
+  {
+    "order": "o1",
+    "year": 2020,
+    "paid": "y",
+    "cost": { "price": 30, "currency": "NOK" },
+    "items": [
+      { "product": "p1", "colours": ["blue", "black"], "quantity": 15 }
+    ],
+    "delivery_days": 5
+  },
+  {
+    "order": "o2",
+    "year": 2020,
+    "paid": "y",
+    "cost": { "price": 13, "currency": "EUR" },
+    "items": [
+      { "product": "p2", "colours": ["white"], "quantity": 4 },
+      { "product": "p3", "colours": ["white", "black"], "quantity": 1 }
+    ],
+    "delivery_days": 4
+  },
+  {
+    "order": "o3",
+    "year": 2018,
+    "paid": "N",
+    "cost": { "price": 33, "currency": "EUR" },
+    "items": [
+      { "product": "p3", "colours": ["blue", "black"], "quantity": 4 }
+    ],
+    "delivery_days": 4
+  },
+  {
+    "order": "o4",
+    "year": 2017,
+    "paid": "y",
+    "cost": { "price": 17, "currency": "NOK" },
+    "items": [
+      { "product": "p2", "colours": ["pink", "black"], "quantity": 14 },
+      { "product": "p", "colours": ["white"], "quantity": 1 }
+    ],
+    "delivery_days": 2
+  },
+  {
+    "order": "o5",
+    "year": 2020,
+    "paid": "y",
+    "cost": { "price": 19, "currency": "NOK" },
+    "items": [
+      { "product": "p1", "quantity": 15 }
+    ],
+    "delivery_days": 3
+  }
+])
+
+Output -
+
+
+
+Description -  Retrieve all documents in a collection
+Code - db.orders.find()
+Output - 
+ 
+Description -  Retrieve all documents that contain paid orders (the “paid” field is “y”)
+Code -  db.orders.find({'paid':'y'});
+Output -
+
+
+
+Description - Retrieve all documents that contain paid orders and the orders are from before 2019
+Code -   db.orders.find({paid:'y',year:{$lt:2019}});
+Output -
+
+
+Description - Retrieve all documents that contain unpaid orders or the orders are from before 2019
+Code -   db.orders.find({$or :[{paid:'N',year:{$lt:2019}}]});
+Output -
+
+Description - Retrieve all documents that contain orders whose price is in NOK
+Code - db.orders.find({'cost.currency' : 'NOK'})
+Output -
+
+Description -  Retrieve all documents that contain orders whose price is less than 18 NOK
+Code - db.orders.find({'cost.price':{$lt: 18},'cost.currency' : 'NOK'})
+Output -
+
+
+Description -  Retrieve all documents with orders that contain product ‘p2’
+Code - db.orders.find({'items.product':'p2'})
+Output -
+
+Description -  Retrieve all documents with orders that contain product whose quantity is less than 13
+Code - db.orders.find({'items.quantity':{$lt:13}})
+Output -
+
+
+Description - Retrieve all document with orders that contain products whose quantity is less than 13 and contain product with blue color
+Code - db.orders.find({'items.quantity':{$lt:13}, ‘items.colours’:’blue’})
+Output -
+
+Description - Retrieve all documents with orders that contain products whose first colour(i.e. First element in the colours array is blue)
+Code - db.orders.find({ "items.colours.0": "blue" })
+Output -
+
+Description - Retrieve the total number of delivery days, grouped by year; retrieve the results only after 2017 (user aggregation pipelines) 
+Code - db.orders.aggregate([
+  { $match: { year: { $gt: 2017 } } },
+  { $group: { _id: "$year", totalDeliveryDays: { $sum: "$delivery_days" } } }
+])
+
+
+
+Description - Retrieve all documents with order with delivery dates more than 4
+Code - db.orders.find({'delivery_days': {$gt:4}})
+Output -
+
+
+Description - Retrieve cost details of order 01
+Code - db.orders.find({order:'o1'},{cost:1})
+Output -
+
+
+Description -  Retrieve item details in paid orders
+Code - db.orders.find({paid:'y'},{items:1})
+Output -
+
+
+Description -  Retrieve the quantity of products in order with delivery days more than or price more than 30
+Code - db.orders.find({$or: [{'delivery_days':{$gt:10}}, {'cost.price':{$gt:30}}]},{'items.quantity':1})
+Output -
+
+$elemMatch - matches documents that content an array field with at least one element that matches all the specified query criteria
+db.price.insertOne({qprices:[124,140,160,110]})
+db.price.insertOne({qprices:[135,146,156,178]})
+
+Description - Find documents with qprices between 130 and 140
+Code - db.price.find({qprices: {$gte: 130 , $lt: 140}})
+db.price.find({qprices: {$elemMatch: {$gte: 130 , $lt: 140}}})
+Output -
+
+Description - Count the number of documents with paid orders
+Code - db.orders.countDocuments({paid: "Y"})
+Output -
+
+Description - Aggregations
+Code - 
+db.profile.insertMany([{name: "Radhika",age:26, status: "Busy"}, {name: "Vedant",age:18, status: "Online"}, {name: "Manya",age:30, status: "Busy"}, {name: "Ishita",age:42, status: "Away"}, {name: "Jiji",age:25, status: "Online"}])
+
+Output -
+
+
+Code - db.profile.count({status:"Online"})
+Output - 
+Description -  Status wise count
+Code - db.profile.aggregate([{$group:{_id:'$status',count: {$sum:1}}}])
+Output - 
+
+Description - Categorywise sum
+Code - db.price.insert({"product":"flowers",category:"decor",price:500});
+db.price.insert({"product":"windchimes",category:"decor",price:900});
+db.price.aggregate([{$group:{_id:'$category',count:{$sum:1},totalamount:{$sum:'$price'}}}])
+db.price.aggregate([{$group:{_id:'$category',count:{$sum:1},totalamount:{$avg:'$price'}}}])
+
+Output -
+
+
+Description - 
+Code - 
+db.Employee.insertOne({name:"Adma",dept:"Admin",languages:["german","french","english","hindi"],age:30,totalExp:10});
+
+db.Employee.insertOne({name:"Anna",dept:"Admin",languages:["english","hindi"],age:35,totalExp:11});
+
+db.Employee.insertOne({name:"Bob",dept:"Facilities",languages:["english","hindi"],age:36,totalExp:14});
+
+db.Employee.insertOne({name:"Cathy",dept:"Facilities",languages:["hindi"],age:31,totalExp:4});
+
+db.Employee.insertOne({name:"Mike",dept:"HR",languages:["english","hindi","spanish"],age:26,totalExp:3});
+
+db.Employee.insertOne({name:"Jenny",dept:"HR",languages:["english","hindi","spanish"],age:25,totalExp:3});
+Output -
+
+
+Description - Fetch the documents of employees in Admin dept
+Code - db.Employee.find({dept:'Admin'})
+db.Employee.aggregate([{$match:{dept:"Admin"}}])
+Output -
+
+Description - Fetch the name and dept of employees in admin dept
+Code - db.Employee.aggregate([{$match:{dept:"Admin"}},{$project:{"name":1,"dept":1}}])
+Output -
+
+Description - Fetch the unique departments
+Code - db.Employee.aggregate([{$group:{"_id":"$dept"}}])
+Output -
+
+Description - Get the total age of all employees
+Code - db.Employee.aggregate([{$group:{"_id":null,"totalAge":{$sum:"$age"}}}])
+Output -
+
+
+Description - Fetch the number of employees and average experience in each department
+Code - db.Employee.aggregate([{$group:{_id:"$dept",noofemployees:{$sum:1},avgexp:{$avg:"$totalExp"}}}])
+Output -
+
+Code - db.Employee.aggregate([{$group:{_id:"$dept",noofemployees:{$sum:1},minExp:{$min:"$totalExp"}}}])
+db.Employee.aggregate([{$group:{_id:"$dept",noofemployees:{$sum:1},maxExp:{$max:"$totalExp"}}}])
+Output -
+
+
+Code - db.Employee.aggregate([{$match:{totalExp: {$lte: 5}}},{$group:{_id: '$dept',average_age:{$avg:'$age'}}}])
+Output -
+
+Description - Fetch the avg age of employees each dept with experience less than or equal to 5 years and avg age more than 30
+Code - db.Employee.aggregate([{$match:{totalExp: {$lte: 5}}},{$group:{_id: '$dept',average_age:{$avg:'$age'}}},{$match:{average_age:{$gte:30}}}])
+Output - 
+
+
+
+Description -  randomly select 2 documents from the input documents
+Code - db.Employee.aggregate({$sample:{size:2}})
+Output -
+
+
+
+
+
+
+#========================
